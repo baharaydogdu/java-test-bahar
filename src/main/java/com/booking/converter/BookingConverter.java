@@ -1,17 +1,16 @@
-package com.booking.util;
+package com.booking.converter;
 
 import com.booking.entity.model.Booking;
 import com.booking.entity.model.BookingData;
 import com.booking.entity.model.BookingRequest;
+import com.booking.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BookingConverter {
     

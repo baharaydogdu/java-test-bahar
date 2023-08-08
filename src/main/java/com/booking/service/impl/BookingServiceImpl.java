@@ -1,12 +1,10 @@
 package com.booking.service.impl;
 
-import com.booking.entity.model.Booking;
 import com.booking.entity.model.BookingData;
 import com.booking.entity.model.BookingRequest;
+import com.booking.filter.BookingFilter;
 import com.booking.service.BookingService;
-import com.booking.util.BookingConverter;
-import com.booking.util.BookingFilter;
-import com.booking.util.BookingValidator;
+import com.booking.converter.BookingConverter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,16 +12,15 @@ import java.util.List;
 @Service
 public class BookingServiceImpl implements BookingService {
     
-    
-    
+    private BookingFilter bookingFilter = new BookingFilter();
     
     @Override
     public List<BookingData> processBookings(String bodyText) {
         List<BookingRequest> bookingRequests = BookingConverter.convert(bodyText);
     
-        bookingRequests = BookingFilter.filterValidRequests(bookingRequests);
+        List<BookingRequest> validBookingRequests = bookingFilter.filterInvalidRequests(bookingRequests);
 
-        List<BookingData> result = BookingConverter.convert(bookingRequests);
+        List<BookingData> result = BookingConverter.convert(validBookingRequests);
         
         return result;
     }
