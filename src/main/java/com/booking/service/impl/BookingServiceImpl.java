@@ -17,21 +17,21 @@ import java.util.List;
 public class BookingServiceImpl implements BookingService {
     private final Logger logger = LoggerFactory.getLogger(BookingServiceImpl.class);
     
-    private BookingFilter bookingFilter;
-    private BookingConverter bookingConverter;
+    private BookingFilter filter;
+    private BookingConverter converter;
     
     @Autowired
-    public BookingServiceImpl(BookingFilter bookingFilter, BookingConverter bookingConverter) {
-        this.bookingFilter = bookingFilter;
-        this.bookingConverter = bookingConverter;
+    public BookingServiceImpl(BookingFilter filter, BookingConverter converter) {
+        this.filter = filter;
+        this.converter = converter;
     }
     
     @Override
     public List<BookingData> processBookings(String bodyText) throws BookingApplicationException {
-        List<BookingRequest> bookingRequests = bookingConverter.convert(bodyText);
+        List<BookingRequest> bookingRequests = converter.convert(bodyText);
+
+        List<BookingRequest> filteredValidBookingRequests = filter.filterOverlappedRequests(filter.filterInvalidRequests(bookingRequests));
         
-        List<BookingRequest> validBookingRequests = bookingFilter.filterInvalidRequests(bookingRequests);
-        
-        return bookingConverter.convert(validBookingRequests);
+        return converter.convert(filteredValidBookingRequests);
     }
 }
