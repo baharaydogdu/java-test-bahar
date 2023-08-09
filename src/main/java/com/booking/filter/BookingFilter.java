@@ -2,15 +2,16 @@ package com.booking.filter;
 
 import com.booking.entity.model.BookingRequest;
 import com.booking.entity.model.BookingTimeSlot;
+import com.booking.exception.BookingApplicationException;
 import com.booking.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,7 @@ public class BookingFilter {
         return removeOfficeHoursExceededRequests(requests);
     }
     
-    public List<BookingRequest> filterOverlappedRequests(List<BookingRequest> requests) {
+    public List<BookingRequest> filterOverlappedRequests(List<BookingRequest> requests) throws BookingApplicationException {
         return removeLateSubmissionOverlappedRequests(requests);
     }
     
@@ -54,8 +55,10 @@ public class BookingFilter {
        return filteredRequests;
     }
     
-    private List<BookingRequest> removeLateSubmissionOverlappedRequests(List<BookingRequest> requests) {
+    private List<BookingRequest> removeLateSubmissionOverlappedRequests(List<BookingRequest> requests) throws BookingApplicationException {
         List<BookingTimeSlot> timeSlots = new ArrayList<>();
+        List<BookingTimeSlot> reservedTimeSlots = new ArrayList<>();
+        
         try {
             for (BookingRequest request : requests) {
                 String startTime = request.getMeetingStartTime();
@@ -63,23 +66,21 @@ public class BookingFilter {
                 timeSlots.add(
                     new BookingTimeSlot(request.getSubmissionTime(), startTime, endTime, request.getEmployeeId()));
             }
-        } catch(ParseException e) {
         
-        }
-        
-        timeSlots.sort(Comparator.comparing(BookingTimeSlot::getStart).thenComparing(BookingTimeSlot::getEnd));
-        
-        List<BookingTimeSlot> result = new ArrayList<>();
-        BookingTimeSlot currentSlot = null;
-        
-        for (BookingTimeSlot slot : timeSlots) {
-            if (currentSlot == null || slot.getStart().compareTo(currentSlot.getEnd()) >= 0) {
-                currentSlot = slot;
-                result.add(slot);
+            timeSlots.sort(Comparator.comparing(BookingTimeSlot::getStart).thenComparing(BookingTimeSlot::getEnd).thenComparing(BookingTimeSlot::getSubmissionTime));
+            
+            BookingTimeSlot currentSlot = null;
+            for (BookingTimeSlot slot : timeSlots) {
+                if (currentSlot == null || slot.getStart().compareTo(currentSlot.getEnd()) >= 0) {
+                    currentSlot = slot;
+                    reservedTimeSlots.add(slot);
+                }
             }
+        } catch(ParseException e) {
+            throw new BookingApplicationException("Exception occurred while filtering overlapped requests", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
-        List<String> employeeIdsToRemove = result.stream()
+        List<String> employeeIdsToRemove = reservedTimeSlots.stream()
             .map(BookingTimeSlot::getEmployeeId)
             .collect(Collectors.toList());
         
