@@ -4,58 +4,34 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtil {
     
-    public static long getHour(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar.get(Calendar.HOUR_OF_DAY);
-    }
-    
-    public static String getDateWithoutHour(String date) {
-        String result = "";
+    public static String getDateWithoutHour(String date) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         SimpleDateFormat formatWithoutHour = new SimpleDateFormat("yyyy-MM-dd");
-    
-        try {
-            result = formatWithoutHour.format(format.parse(date));
-        }
-        catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return result;
+
+        return formatWithoutHour.format(format.parse(date));
     }
     
-    public static String getHour(String date) {
-        String result = "";
+    public static String getHour(String date) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         SimpleDateFormat formatHour = new SimpleDateFormat("HH:mm");
-        
-        try {
-            result = formatHour.format(format.parse(date));
-        }
-        catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return result;
+
+        return formatHour.format(format.parse(date));
     }
     
-    public static String getEndTime(String startTime, String duration) {
-        String result = "";
+    public static String getEndTime(String startTime, String duration) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         
-        try {
-            Date startDate = format.parse(startTime);
-            Date endDate = DateUtils.addHours(startDate, Integer.parseInt(duration));
-            result = format.format(endDate);
-        }
-        catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return result;
+        Date startDate = format.parse(startTime);
+        Date endDate = DateUtils.addHours(startDate, Integer.parseInt(duration));
+
+        return format.format(endDate);
+    }
+    
+    public static Date addHours(Date date, int hour) {
+        return DateUtils.addHours(date, hour);
     }
 }

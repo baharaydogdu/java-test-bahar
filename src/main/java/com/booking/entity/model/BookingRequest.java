@@ -1,7 +1,9 @@
 package com.booking.entity.model;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @AllArgsConstructor
 public class BookingRequest {
     
@@ -10,9 +12,6 @@ public class BookingRequest {
     private String employeeId;
     private String meetingStartTime;
     private String meetingDuration;
-    
-    public BookingRequest() {
-    }
     
     public BookingRequest(Builder builder) {
         this.officeHours = builder.officeHours;
@@ -40,6 +39,16 @@ public class BookingRequest {
     
     public String getMeetingDuration() {
         return meetingDuration;
+    }
+    
+    @Override
+    public String toString() {
+        return "BookingRequest{" +
+            "submissionTime='" + this.submissionTime + '\'' +
+            ", employeeId='" + this.employeeId + '\'' +
+            ", meetingStartTime='" + this.meetingStartTime + '\'' +
+            ", meetingDuration='" + this.meetingDuration + '\'' +
+            "}\n";
     }
     
     public static class Builder {
