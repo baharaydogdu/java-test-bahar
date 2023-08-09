@@ -34,4 +34,24 @@ public class DateUtil {
     public static Date addHours(Date date, int hour) {
         return DateUtils.addHours(date, hour);
     }
+    
+    public static Date parseMeetingStartTime(String meetingStartTime) throws ParseException {
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        return dateformat.parse(meetingStartTime);
+    }
+    
+    public static Date parseOfficeHours(String officeHours) throws ParseException {
+        SimpleDateFormat officeHoursFormat = new SimpleDateFormat("HHmm");
+        return officeHoursFormat.parse(officeHours);
+    }
+    
+    public static Date parseHour(String date) throws ParseException {
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm a");
+        return hourFormat.parse(date);
+    }
+    
+    public static String formatHour(Date date) {
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm a");
+        return hourFormat.format(date);
+    }
 }

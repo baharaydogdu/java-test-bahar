@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -31,28 +30,26 @@ public class BookingFilter {
     
     private List<BookingRequest> removeOfficeHoursExceededRequests(List<BookingRequest> requests) {
         List<BookingRequest> filteredRequests = new ArrayList<>();
-        
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm a");
-        SimpleDateFormat officeHoursFormat = new SimpleDateFormat("HHmm");
     
-        requests.forEach(request -> {
+        for (BookingRequest request : requests) {
             try {
-                Date meetingStartDate = dateformat.parse(request.getMeetingStartTime());
-                Date meetingEndDate = DateUtil.addHours(meetingStartDate, Integer.parseInt(request.getMeetingDuration()));
-        
-                Date officeHoursStart = officeHoursFormat.parse(request.getOfficeHours().split(" ")[0]);
-                Date officeHoursEnd = officeHoursFormat.parse(request.getOfficeHours().split(" ")[1]);
-        
-                if (hourFormat.parse(hourFormat.format(meetingStartDate)).getTime() >= officeHoursStart.getTime()
-                    && hourFormat.parse(hourFormat.format(meetingEndDate)).getTime() <= officeHoursEnd.getTime()) {
+                Date meetingStartDate = DateUtil.parseMeetingStartTime(request.getMeetingStartTime());
+                Date meetingEndDate = DateUtil.addHours(meetingStartDate,
+                    Integer.parseInt(request.getMeetingDuration()));
+            
+                Date officeHoursStart = DateUtil.parseOfficeHours(request.getOfficeHours().split(" ")[0]);
+                Date officeHoursEnd = DateUtil.parseOfficeHours(request.getOfficeHours().split(" ")[1]);
+            
+                if (DateUtil.parseHour(DateUtil.formatHour(meetingStartDate)).getTime() >= officeHoursStart.getTime()
+                    && DateUtil.parseHour(DateUtil.formatHour(meetingEndDate)).getTime() <= officeHoursEnd.getTime()) {
                     filteredRequests.add(request);
                 }
-            } catch (ParseException e) {
+            }
+            catch (ParseException e) {
                 logger.info("Request validation failed for request: <{}>", request);
             }
-        });
-       return filteredRequests;
+        }
+        return filteredRequests;
     }
     
     private List<BookingRequest> removeLateSubmissionOverlappedRequests(List<BookingRequest> requests) throws BookingApplicationException {
