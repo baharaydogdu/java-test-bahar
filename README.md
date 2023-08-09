@@ -51,6 +51,12 @@ Clone the repository
 git@github.com:baharaydogdu/java-test-bahar.git
 ```
 
+Navigate to project folder
+
+```
+cd java-test-bahar/
+```
+
 Build project
 
 ```
